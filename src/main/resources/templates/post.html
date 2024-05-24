@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang=ko>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script th:src="@{/ckeditor5/build/ckeditor.js}"></script>
+</head>
+<body>
+<input placeholder="제목을 작성해주세요">
+<div id="editor"></div>
+<button>취소하기</button>
+<button>작성하기</button>
+</body>
+</html>
+<script>
+    ClassicEditor
+        .create( document.querySelector( '#editor' ) )
+        .catch( error => {
+            console.error( error );
+        } );
+</script>
