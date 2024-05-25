@@ -8,18 +8,19 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script th:src="@{/ckeditor5/build/ckeditor.js}"></script>
+    <script th:src="@{/js/editor.js}" ></script>
 </head>
 <body>
 <input placeholder="제목을 작성해주세요">
-<div id="editor"></div>
+<div id="editor">내용을 입력해주세요.</div>
+<input type="datetime-local"> ~ <input type="datetime-local">
 <button>취소하기</button>
-<button>작성하기</button>
+<button id="post-btn">작성하기</button>
 </body>
 </html>
 <script>
-    ClassicEditor
-        .create( document.querySelector( '#editor' ) )
-        .catch( error => {
-            console.error( error );
-        } );
+    const postBtn = document.querySelector('#post-btn');
+    postBtn.addEventListener('click', function() {
+        console.log(window.editor.getData());
+    });
 </script>
