@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,10 +47,10 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
     @ResponseBody
-    public long addItem(@Valid @RequestBody PostCreateReqeust dto, BindingResult result){
+    public long addItem(@Valid @RequestBody PostCreateReqeust dto, BindingResult result) throws MethodArgumentNotValidException {
         if (result.hasErrors()) {
             log.info("errors={}", result);
-            throw new IllegalArgumentException("Validation error occurred");
+            throw new MethodArgumentNotValidException(null, result);
         }
         return postService.insertPost(dto);
     }
