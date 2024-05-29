@@ -4,6 +4,7 @@ import com.boardbuilderslog.bulletin_board.dto.PostCreateReqeust;
 import com.boardbuilderslog.bulletin_board.dto.PostSelectOneResponse;
 import com.boardbuilderslog.bulletin_board.entity.Post;
 import com.boardbuilderslog.bulletin_board.repsoitory.PostRepository;
+import com.boardbuilderslog.bulletin_board.service.FileStorageService;
 import com.boardbuilderslog.bulletin_board.service.PostService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -22,21 +23,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-    @Value("${file.dir}")
-    private String fileDir;
     private final PostRepository repository;
+    private final FileStorageService fileStorageService;
     @Transactional
     @Override
     public long insertPost(PostCreateReqeust dto) throws IOException {
         MultipartFile thumbnail = dto.getThumbnail();
-        if(!thumbnail.isEmpty()){
-            File directory = new File(fileDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            String fullPath = fileDir + "/" +thumbnail.getOriginalFilename();
-            log.info("파일 저장 fullPath={}", fullPath);
-            thumbnail.transferTo(new File(fullPath));
+        if (!thumbnail.isEmpty()) {
+            String fileUrl = fileStorageService.storeFile(thumbnail);
+            dto.setThumbnailUrl(fileUrl);  // 웹 경로 설정
         }
         return repository.save(dto.toEntity()).getId();
     }
@@ -47,6 +42,7 @@ public class PostServiceImpl implements PostService {
                 .map(post -> PostSelectOneResponse.builder()
                         .title(post.getTitle())
                         .content(post.getContent())
+                        .thumbnailUrl(post.getThumbnailUrl())
                         .startDate(post.getStartDate())
                         .endDate(post.getEndDate())
                         .build())

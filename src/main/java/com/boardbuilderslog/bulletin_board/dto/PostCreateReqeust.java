@@ -30,6 +30,7 @@ public class PostCreateReqeust {
     private LocalDate endDate;
 
     private MultipartFile thumbnail;
+    private String thumbnailUrl;
 
     @AssertTrue(message = "{startDateBeforeEndDate}")
     public boolean isStartDateBeforeEndDate() {
@@ -44,6 +45,7 @@ public class PostCreateReqeust {
                 .title(title)
                 .content(content)
                 .isPublic(isPublic)
+                .thumbnailUrl(thumbnailUrl)
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();

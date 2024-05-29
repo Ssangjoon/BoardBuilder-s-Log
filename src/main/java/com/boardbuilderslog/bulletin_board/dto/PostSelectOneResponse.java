@@ -12,4 +12,5 @@ public class PostSelectOneResponse {
     private String content;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String thumbnailUrl;
 }
