@@ -12,66 +12,71 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-<!--    <div th:if="${#fields.hasGlobalErrors()}">-->
-<!--        <p class="field-error" th:each="err : ${#fields.globalErrors()}"-->
-<!--           th:text="${err}">글로벌 오류 메시지</p>-->
-<!--    </div>-->
-    <form name="postForm">
-        <div>
-            <input placeholder="제목을 작성해주세요" id="title-input" name="title">
-            <div id="title-error" class="field-error"></div>
-        </div>
-        <div>
-            <div id="editor" name="content">내용을 입력해주세요.</div>
-            <div id="content-error" class="field-error"></div>
-        </div>
-        <div>
-            <label for="public-yes">공개</label>
-            <input type="radio" id="public-yes" name="isPublic" value="true" checked>
-            <label for="public-no">비공개</label>
-            <input type="radio" id="public-no" name="isPublic" value="false">
-            <div id="isPublic-error" class="field-error"></div>
-        </div>
-        <div>
-            <input type="date" id="start-date" name="startDate">
-            ~
-            <input type="date" id="end-date" name="endDate">
-            <div id="startDate-error" class="field-error"></div>
-            <div id="endDate-error" class="field-error"></div>
-            <div id="startDateBeforeEndDate-error" class="field-error"></div>
-        </div>
-        <div>
-            <button type="button" id="cancel-btn" onclick="window.location.href='/';">취소하기</button>
-            <button type="submit" id="post-btn">작성하기</button>
-        </div>
-    </form>
+    <header>
+        <h1>게시물 작성</h1>
+    </header>
+    <main>
+        <section>
+            <form name="postForm" enctype="multipart/form-data">
+                <fieldset>
+                    <legend>게시물 정보</legend>
+                    <div>
+                        <label for="title-input">제목</label>
+                        <input placeholder="제목을 작성해주세요" id="title-input" name="title">
+                        <div id="title-error" class="field-error"></div>
+                    </div>
+                    <div>
+                        <label for="content">내용</label>
+                        <div id="editor" name="content" contenteditable="true">내용을 입력해주세요.</div>
+                        <div id="content-error" class="field-error"></div>
+                    </div>
+                    <div>
+                        <fieldset>
+                            <legend>공개 여부</legend>
+                            <label for="public-yes">공개</label>
+                            <input type="radio" id="public-yes" name="isPublic" value="true" checked>
+                            <label for="public-no">비공개</label>
+                            <input type="radio" id="public-no" name="isPublic" value="false">
+                            <div id="isPublic-error" class="field-error"></div>
+                        </fieldset>
+                    </div>
+                    <div>
+                        <label for="start-date">시작일</label>
+                        <input type="date" id="start-date" name="startDate">
+                        <label for="end-date">종료일</label>
+                        <input type="date" id="end-date" name="endDate">
+                        <div id="startDate-error" class="field-error"></div>
+                        <div id="endDate-error" class="field-error"></div>
+                        <div id="startDateBeforeEndDate-error" class="field-error"></div>
+                    </div>
+                    <div>
+                        <label for="thumbnail">썸네일</label>
+                        <input type="file" id="thumbnail" name="thumbnail">
+                        <div id="thumbnail-error" class="field-error"></div>
+                    </div>
+                    <div>
+                        <button type="button" id="cancel-btn" onclick="window.location.href='/';">취소하기</button>
+                        <button type="submit" id="post-btn">작성하기</button>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+<footer>
+    <p>&copy; 2024 Bulletin Board</p>
+</footer>
 <script>
     document.querySelector("#post-btn").addEventListener("click", function(e) {
         e.preventDefault();
 
-        // Clear previous errors
         document.querySelectorAll(".field-error").forEach(el => el.textContent = "");
 
-        const title = document.querySelector("#title-input").value;
-        const isPublic = document.querySelector("input[name='isPublic']:checked").value;
-        const startDate = document.querySelector("#start-date").value;
-        const endDate = document.querySelector("#end-date").value;
-        const content = window.editor.getData();
-
-        const postData = {
-            title: title,
-            isPublic: isPublic,
-            startDate: startDate,
-            endDate: endDate,
-            content: content
-        };
+        const formData = new FormData(document.querySelector("form[name='postForm']"));
+        formData.append("content", window.editor.getData())
 
         fetch("/posts", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(postData)
+            body: formData
         })
             .then(response => {
                 if (!response.ok) {

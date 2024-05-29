@@ -5,10 +5,13 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
 public class PostCreateReqeust {
 
     @NotBlank(message = "{title.notBlank}")
@@ -25,14 +28,18 @@ public class PostCreateReqeust {
 
     @NotNull(message = "{endDate.notNull}")
     private LocalDate endDate;
-    @AssertTrue(message = "지정일을 확인하십시오.")
-    public boolean isStartDateBeforeEndDate(){
+
+    private MultipartFile thumbnail;
+
+    @AssertTrue(message = "{startDateBeforeEndDate}")
+    public boolean isStartDateBeforeEndDate() {
         if (startDate == null || endDate == null) {
-            return true;
+            return true; // 기본적으로 null 값은 다른 애노테이션에서 처리합니다.
         }
         return !startDate.isAfter(endDate);
     }
-    public Post toEntity(){
+
+    public Post toEntity() {
         return Post.builder()
                 .title(title)
                 .content(content)
