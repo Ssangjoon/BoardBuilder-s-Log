@@ -6,16 +6,20 @@ import com.boardbuilderslog.bulletin_board.entity.Post;
 import com.boardbuilderslog.bulletin_board.repsoitory.PostRepository;
 import com.boardbuilderslog.bulletin_board.service.FileStorageService;
 import com.boardbuilderslog.bulletin_board.service.PostService;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Pageable;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +29,15 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
     private final PostRepository repository;
     private final FileStorageService fileStorageService;
+
+    @PostConstruct
+    public void init(){
+        repository.save(Post.builder().title("제목1").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
+        repository.save(Post.builder().title("제목2").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
+        repository.save(Post.builder().title("제목3").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
+        repository.save(Post.builder().title("제목4").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
+        repository.save(Post.builder().title("제목5").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
+    }
     @Transactional
     @Override
     public long insertPost(PostCreateReqeust dto) throws IOException {
@@ -50,7 +63,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostSelectOneResponse> selectList() {
-        return repository.findAllByIsPublicTrue();
+    public Page<PostSelectOneResponse> selectList(Pageable pageable) {
+        return repository.findAllByIsPublicTrue(pageable);
     }
 }

@@ -6,8 +6,106 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        .pagination a {
+            margin: 0 5px;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+        }
+        .pagination a.current {
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
 </head>
+<style>
+    tr { cursor: pointer; }
+</style>
 <body>
+    <h1>Posts</h1>
+    <button th:onclick="'javascript:redirectToAddPost()'">작성하기</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Thumbnail</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="post : ${posts.content}" th:onclick="'javascript:redirectToPost(' + ${post.id} + ')'">
+                <td th:text="${post.title}">Title</td>
+                <td th:text="${post.startDate}">Start Date</td>
+                <td th:text="${post.endDate}">End Date</td>
+                <td th:text="${post.thumbnailUrl}">End Date</td>
+            </tr>
+        </tbody>
+    </table>
+    <div>
+        <span th:text="'Page ' + ${posts.number + 1} + ' of ' + ${posts.totalPages}"></span>
+        <span th:text="'Total items: ' + ${posts.totalElements}"></span>
+    </div>
 
+    <div class="pagination" id="pagination">
+        <!-- Pagination links will be generated here by JavaScript -->
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPage = [[${posts.number}]];
+            const totalPages = [[${posts.totalPages}]];
+            const paginationContainer = document.getElementById('pagination');
+
+            function createPageLink(page, text, isCurrent = false) {
+                const link = document.createElement('a');
+                link.href = `?page=${page}`;
+                link.textContent = text;
+                if (isCurrent) {
+                    link.classList.add('current');
+                }
+                return link;
+            }
+
+            function renderPagination(currentPage, totalPages) {
+                paginationContainer.innerHTML = '';
+
+                let startPage = Math.max(0, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (endPage - startPage < 3) {
+                    if (startPage === 0) {
+                        endPage = Math.min(5, totalPages);
+                    } else if (endPage === totalPages) {
+                        startPage = Math.max(0, totalPages - 4);
+                    }
+                }
+
+                if (currentPage > 0) {
+                    paginationContainer.appendChild(createPageLink(0, 'First'));
+                    paginationContainer.appendChild(createPageLink(currentPage - 0, 'Previous'));
+                }
+
+                for (let i = startPage; i < endPage; i++) {
+                    console.log("i =>", i, "startPage => ", startPage, "endPage",endPage, "currentPage", currentPage)
+                    paginationContainer.appendChild(createPageLink(i, i+1, i === currentPage));
+                }
+
+                if (currentPage < totalPages) {
+                    paginationContainer.appendChild(createPageLink(currentPage + 1, 'Next'));
+                    paginationContainer.appendChild(createPageLink(totalPages, 'Last'));
+                }
+            }
+
+            renderPagination(currentPage, totalPages);
+        });
+        function redirectToPost(postId) {
+            window.location.href = '/posts/' + postId;
+        }
+        function redirectToAddPost() {
+            window.location.href = '/posts/addPost';
+        }
+    </script>
 </body>
 </html>
