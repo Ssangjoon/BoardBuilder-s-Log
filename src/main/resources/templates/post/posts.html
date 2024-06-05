@@ -92,7 +92,7 @@
                     paginationContainer.appendChild(createPageLink(i, i+1, i === currentPage));
                 }
 
-                if (currentPage < totalPages) {
+                if (currentPage+1 < totalPages) {
                     paginationContainer.appendChild(createPageLink(currentPage + 1, 'Next'));
                     paginationContainer.appendChild(createPageLink(totalPages, 'Last'));
                 }

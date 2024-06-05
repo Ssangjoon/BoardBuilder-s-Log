@@ -4,10 +4,8 @@ import com.boardbuilderslog.bulletin_board.dto.PostCreateReqeust;
 import com.boardbuilderslog.bulletin_board.dto.PostSelectOneResponse;
 import com.boardbuilderslog.bulletin_board.service.PostService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -16,12 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.data.domain.Pageable;
-import java.io.File;
+
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -35,12 +31,7 @@ public class PostController {
         log.info(String.valueOf(pageable.getOffset()));
         Page<PostSelectOneResponse> postResponses = postService.selectList(pageable);
         model.addAttribute("posts", postResponses);
-        return "posts";
-    }
-    @GetMapping("/addPost")
-    public String addPost(){
-        log.info("PostController addPost");
-        return "addPost";
+        return "post/posts";
     }
     @GetMapping("/{id}")
     public String post(@PathVariable Long id, Model model){
@@ -49,9 +40,9 @@ public class PostController {
 
         if (res != null) {
             model.addAttribute("post", res);
-            return "post";
+            return "post/post";
         } else {
-            return "posts";
+            return "post/posts";
         }
     }
     @ResponseStatus(HttpStatus.OK)

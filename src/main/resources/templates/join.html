@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group input[type="checkbox"] {
+            width: auto;
+        }
+        .form-group input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .form-group input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .form-group .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+
+</head>
+<body>
+<main class="container">
+    <header>
+        <h2>회원가입</h2>
+    </header>
+    <form action="/register" method="post">
+        <section class="form-group">
+            <label for="username">사용자 이름:</label>
+            <input type="text" id="username" name="username" required>
+            <div id="usernameError" class="error"></div>
+        </section>
+        <section class="form-group">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" name="password" required>
+        </section>
+        <section class="form-group">
+            <label for="confirmPassword">비밀번호 확인:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <div id="passwordError" class="error"></div>
+        </section>
+        <section class="form-group">
+            <label for="email">이메일 주소:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="button" id="emailVerifyBtn">이메일 인증</button>
+        </section>
+        <section class="form-group">
+            <label for="fullName">이름:</label>
+            <input type="text" id="fullName" name="fullName" required>
+        </section>
+        <section class="form-group">
+            <label for="phone">전화번호:</label>
+            <input type="tel" id="phone" name="phone" required>
+        </section>
+        <section class="form-group">
+            <label for="address">주소:</label>
+            <input type="text" id="address" name="address" disabled>
+            <button type="button" id="searchAddressBtn">주소 검색</button>
+        </section>
+        <section class="form-group">
+            <label for="roadAddress">도로명주소:</label>
+            <input type="text" id="roadAddress" name="address" disabled>
+        </section>
+        <section class="form-group">
+            <label for="zip">우편번호:</label>
+            <input type="text" id="zip" name="zip" disabled>
+        </section>
+        <section class="form-group">
+            <label for="dob">생년월일:</label>
+            <input type="date" id="dob" name="dob">
+        </section>
+        <section class="form-group">
+            <input type="checkbox" id="marketingConsent" name="marketingConsent">
+            <label for="marketingConsent">마케팅 이메일 수신에 동의합니다.</label>
+        </section>
+        <section class="form-group">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms">이용 약관에 동의합니다.</label>
+        </section>
+        <section class="form-group">
+            <input type="checkbox" id="privacy" name="privacy" required>
+            <label for="privacy">개인정보 보호정책에 동의합니다.</label>
+        </section>
+        <section class="form-group">
+            <input type="submit" value="회원가입">
+        </section>
+    </form>
+    <footer>
+        <p>&copy; 2024 MyCompany. All rights reserved.</p>
+    </footer>
+</main>
+
+<!-- Daum 우편번호 서비스 API 스크립트 추가 -->
+<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const emailInput = document.getElementById('email');
+        const addressInput = document.getElementById('address');
+        const zip = document.getElementById('zip');
+        const roadAddress = document.getElementById('roadAddress');
+        const usernameError = document.getElementById('usernameError');
+        const passwordError = document.getElementById('passwordError');
+
+        const checkUsername = () => {
+            const username = usernameInput.value;
+            // 실제 API 호출로 사용자 이름 중복 확인
+            if (username === 'admin') {
+                usernameError.textContent = '사용자 이름이 이미 사용 중입니다.';
+            } else {
+                usernameError.textContent = '';
+            }
+        };
+
+        const checkPasswordMatch = () => {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            if (password !== confirmPassword) {
+                passwordError.textContent = '비밀번호가 일치하지 않습니다.';
+            } else {
+                passwordError.textContent = '';
+            }
+        };
+
+        const sendEmailVerification = () => {
+            const email = emailInput.value;
+            // 실제 이메일 인증 API 호출
+            alert('인증 이메일이 전송되었습니다.');
+        };
+
+        const searchAddress = () => {
+            new daum.Postcode({
+                oncomplete: (data) => {
+                    addressInput.value = data.address;
+                    zip.value = data.zonecode;
+                    roadAddress.value = data.roadAddress;
+                }
+            }).open();
+        };
+
+        usernameInput.addEventListener('blur', checkUsername);
+        confirmPasswordInput.addEventListener('blur', checkPasswordMatch);
+        document.getElementById('emailVerifyBtn').addEventListener('click', sendEmailVerification);
+        document.getElementById('searchAddressBtn').addEventListener('click', searchAddress);
+    });
+</script>
+</body>
+</html>
