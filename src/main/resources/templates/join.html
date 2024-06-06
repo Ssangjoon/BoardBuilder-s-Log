@@ -5,7 +5,6 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>회원가입</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,14 +50,13 @@
             font-size: 0.9em;
         }
     </style>
-
 </head>
 <body>
 <main class="container">
     <header>
         <h2>회원가입</h2>
     </header>
-    <form action="/register" method="post">
+    <form id="registrationForm">
         <section class="form-group">
             <label for="username">사용자 이름:</label>
             <input type="text" id="username" name="username" required>
@@ -67,61 +65,67 @@
         <section class="form-group">
             <label for="password">비밀번호:</label>
             <input type="password" id="password" name="password" required>
-        </section>
-        <section class="form-group">
-            <label for="confirmPassword">비밀번호 확인:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
             <div id="passwordError" class="error"></div>
         </section>
         <section class="form-group">
-            <label for="email">이메일 주소:</label>
+            <label for="email">이메일:</label>
             <input type="email" id="email" name="email" required>
-            <button type="button" id="emailVerifyBtn">이메일 인증</button>
+            <div id="emailError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="fullName">이름:</label>
             <input type="text" id="fullName" name="fullName" required>
+            <div id="fullNameError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="phone">전화번호:</label>
-            <input type="tel" id="phone" name="phone" required>
+            <input type="text" id="phone" name="phone" required>
+            <div id="phoneError" class="error"></div>
+        </section>
+        <section class="form-group">
+            <label for="dateOfBirth">생년월일:</label>
+            <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+            <div id="dateOfBirthError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="address">주소:</label>
-            <input type="text" id="address" name="address" disabled>
-            <button type="button" id="searchAddressBtn">주소 검색</button>
+            <input type="text" id="address" name="address" required>
+            <div id="addressError" class="error"></div>
         </section>
         <section class="form-group">
-            <label for="roadAddress">도로명주소:</label>
-            <input type="text" id="roadAddress" name="address" disabled>
+            <label for="roadAddress">도로명 주소:</label>
+            <input type="text" id="roadAddress" name="roadAddress" required>
+            <div id="roadAddressError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="zip">우편번호:</label>
-            <input type="text" id="zip" name="zip" disabled>
+            <input type="text" id="zip" name="zip" required>
+            <div id="zipError" class="error"></div>
         </section>
         <section class="form-group">
-            <label for="dob">생년월일:</label>
-            <input type="date" id="dob" name="dob">
+            <label>
+                <input type="checkbox" id="marketingConsent" name="marketingConsent">
+                마케팅 정보 수신 동의
+            </label>
         </section>
         <section class="form-group">
-            <input type="checkbox" id="marketingConsent" name="marketingConsent">
-            <label for="marketingConsent">마케팅 이메일 수신에 동의합니다.</label>
+            <label>
+                <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+                이용 약관에 동의
+            </label>
+            <div id="termsAcceptedError" class="error"></div>
         </section>
         <section class="form-group">
-            <input type="checkbox" id="terms" name="terms" required>
-            <label for="terms">이용 약관에 동의합니다.</label>
-        </section>
-        <section class="form-group">
-            <input type="checkbox" id="privacy" name="privacy" required>
-            <label for="privacy">개인정보 보호정책에 동의합니다.</label>
+            <label>
+                <input type="checkbox" id="privacyPolicyAccepted" name="privacyPolicyAccepted" required>
+                개인정보 보호정책에 동의
+            </label>
+            <div id="privacyPolicyAcceptedError" class="error"></div>
         </section>
         <section class="form-group">
             <input type="submit" value="회원가입">
         </section>
     </form>
-    <footer>
-        <p>&copy; 2024 MyCompany. All rights reserved.</p>
-    </footer>
 </main>
 
 <!-- Daum 우편번호 서비스 API 스크립트 추가 -->
@@ -138,13 +142,21 @@
         const usernameError = document.getElementById('usernameError');
         const passwordError = document.getElementById('passwordError');
 
-        const checkUsername = () => {
+        const checkUsername = async () => {
             const username = usernameInput.value;
-            // 실제 API 호출로 사용자 이름 중복 확인
-            if (username === 'admin') {
-                usernameError.textContent = '사용자 이름이 이미 사용 중입니다.';
-            } else {
+            try {
+                const response = await fetch(`/auth/check-username?username=${encodeURIComponent(username)}`);
+                if (!response.ok) {
+                    const errors = await response.json();
+                    handleValidationErrors(errors);
+                    return false;
+                }
                 usernameError.textContent = '';
+                return true;
+            } catch (error) {
+                console.error('Error checking username:', error);
+                usernameError.textContent = '사용자 이름 확인 중 오류가 발생했습니다.';
+                return false;
             }
         };
 
@@ -172,6 +184,15 @@
                     roadAddress.value = data.roadAddress;
                 }
             }).open();
+        };
+        const handleValidationErrors = (errors) => {
+            for (const [field, message] of Object.entries(errors)) {
+                console.log(field);
+                const errorElement = document.getElementById(`${field}Error`);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                }
+            }
         };
 
         usernameInput.addEventListener('blur', checkUsername);
