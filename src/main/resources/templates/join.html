@@ -49,6 +49,10 @@
             color: red;
             font-size: 0.9em;
         }
+        .form-group input[type="submit"]:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -68,38 +72,43 @@
             <div id="passwordError" class="error"></div>
         </section>
         <section class="form-group">
-            <label for="email">이메일:</label>
-            <input type="email" id="email" name="email" required>
-            <div id="emailError" class="error"></div>
+            <label for="confirmPassword">비밀번호 확인:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
         </section>
+<!--        <section class="form-group">-->
+<!--            <label for="email">이메일:</label>-->
+<!--            <input type="email" id="email" name="email" required>-->
+<!--            <div id="emailError" class="error"></div>-->
+<!--        </section>-->
         <section class="form-group">
             <label for="fullName">이름:</label>
             <input type="text" id="fullName" name="fullName" required>
             <div id="fullNameError" class="error"></div>
         </section>
-        <section class="form-group">
-            <label for="phone">전화번호:</label>
-            <input type="text" id="phone" name="phone" required>
-            <div id="phoneError" class="error"></div>
-        </section>
-        <section class="form-group">
-            <label for="dateOfBirth">생년월일:</label>
-            <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-            <div id="dateOfBirthError" class="error"></div>
-        </section>
+<!--        <section class="form-group">-->
+<!--            <label for="phone">전화번호:</label>-->
+<!--            <input type="text" id="phone" name="phone" required>-->
+<!--            <div id="phoneError" class="error"></div>-->
+<!--        </section>-->
+<!--        <section class="form-group">-->
+<!--            <label for="dateOfBirth">생년월일:</label>-->
+<!--            <input type="date" id="dateOfBirth" name="dateOfBirth" required>-->
+<!--            <div id="dateOfBirthError" class="error"></div>-->
+<!--        </section>-->
         <section class="form-group">
             <label for="address">주소:</label>
-            <input type="text" id="address" name="address" required>
+            <button type="button" id="searchAddressBtn">주소검색</button>
+            <input type="text" id="address" name="address" disabled>
             <div id="addressError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="roadAddress">도로명 주소:</label>
-            <input type="text" id="roadAddress" name="roadAddress" required>
+            <input type="text" id="roadAddress" name="roadAddress" disabled>
             <div id="roadAddressError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="zip">우편번호:</label>
-            <input type="text" id="zip" name="zip" required>
+            <input type="text" id="zip" name="zip" disabled>
             <div id="zipError" class="error"></div>
         </section>
         <section class="form-group">
@@ -123,7 +132,7 @@
             <div id="privacyPolicyAcceptedError" class="error"></div>
         </section>
         <section class="form-group">
-            <input type="submit" value="회원가입">
+            <input type="submit" value="회원가입" disabled>
         </section>
     </form>
 </main>
@@ -132,72 +141,135 @@
 <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const emailInput = document.getElementById('email');
-        const addressInput = document.getElementById('address');
-        const zip = document.getElementById('zip');
-        const roadAddress = document.getElementById('roadAddress');
-        const usernameError = document.getElementById('usernameError');
-        const passwordError = document.getElementById('passwordError');
+        const fields = {
+            username: { input: document.getElementById('username'), valid: false },
+            password: { input: document.getElementById('password'), valid: false },
+            confirmPassword: { input: document.getElementById('confirmPassword'), valid: false },
+            // email: { input: document.getElementById('email'), valid: false },
+            fullName: { input: document.getElementById('fullName'), valid: false },
+            // phone: { input: document.getElementById('phone'), valid: false },
+            // dateOfBirth: { input: document.getElementById('dateOfBirth'), valid: false },
+            address: { input: document.getElementById('address'), valid: false },
+            // roadAddress: { input: document.getElementById('roadAddress'), valid: false },
+            // zip: { input: document.getElementById('zip'), valid: false },
+            termsAccepted: { input: document.getElementById('termsAccepted'), valid: false },
+            privacyPolicyAccepted: { input: document.getElementById('privacyPolicyAccepted'), valid: false }
+        };
+        const registerButton = document.querySelector('input[type="submit"]');
+
+        const updateRegisterButtonState = () => {
+            registerButton.disabled = !Object.values(fields).every(field => field.valid);
+            if (registerButton.disabled) {
+                const invalidFields = Object.keys(fields).map(field => {
+                    return { field, valid: fields[field].valid };
+                }).filter(field => !field.valid);
+
+                console.table(invalidFields);
+            }
+        }
+
+        // 모든 값 변경에 호출되고 updateRegisterButtonState을 실행한다.
+        // 필드의 valid값을 갱신한다.
+        // valid가 false일 경우 errorMessage를 세팅한다.
+        const setFieldValid = (field, isValid, message = '') =>{
+            fields[field].valid = isValid;
+            if(!isValid){
+                const errorElement = document.getElementById(`${field}Error`);
+                if(errorElement){
+                    console.error("errorElement => ", message);
+                    errorElement.textContent = message;
+                }
+            }
+            updateRegisterButtonState();
+        }
+
+        // 에러메시지를 세팅한다.
+        const handleValidationErrors = (errors) => {
+            for (const [field, message] of Object.entries(errors)) {
+                setFieldValid(field, false, message);
+            }
+        };
+
 
         const checkUsername = async () => {
-            const username = usernameInput.value;
+            const username = fields.username.input.value;
             try {
                 const response = await fetch(`/auth/check-username?username=${encodeURIComponent(username)}`);
                 if (!response.ok) {
                     const errors = await response.json();
                     handleValidationErrors(errors);
-                    return false;
+                    return;
                 }
-                usernameError.textContent = '';
-                return true;
+                setFieldValid('username', true);
             } catch (error) {
                 console.error('Error checking username:', error);
-                usernameError.textContent = '사용자 이름 확인 중 오류가 발생했습니다.';
-                return false;
+                setFieldValid('username', false, '사용자 이름 확인 중 오류가 발생했습니다.');
             }
         };
 
-        const checkPasswordMatch = () => {
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+        const checkPasswordMatch = async () => {
+            const password = fields.password.input.value;
+            const confirmPassword = fields.confirmPassword.input.value;
             if (password !== confirmPassword) {
-                passwordError.textContent = '비밀번호가 일치하지 않습니다.';
-            } else {
-                passwordError.textContent = '';
+                setFieldValid('password', false, '비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            try {
+                const response = await fetch('/auth/validatePassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+                if(!response.ok){
+                    const errors = await response.json();
+                    handleValidationErrors(errors);
+                    return;
+                }
+                setFieldValid("password", true);
+                setFieldValid('confirmPassword', true);
+            } catch (error) {
+                console.error('Error:', error);
+                setFieldValid('password', false, '비밀번호 확인 중 오류가 발생했습니다.');
             }
         };
 
-        const sendEmailVerification = () => {
-            const email = emailInput.value;
-            // 실제 이메일 인증 API 호출
-            alert('인증 이메일이 전송되었습니다.');
-        };
+        // const sendEmailVerification = () => {
+        //     const email = emailInput.value;
+        //     // 실제 이메일 인증 API 호출
+        //     alert('인증 이메일이 전송되었습니다.');
+        // };
 
         const searchAddress = () => {
             new daum.Postcode({
                 oncomplete: (data) => {
-                    addressInput.value = data.address;
-                    zip.value = data.zonecode;
-                    roadAddress.value = data.roadAddress;
+                    document.getElementById('address').value = data.address;
+                    document.getElementById('zip').value = data.zonecode;
+                    document.getElementById('roadAddress').value = data.roadAddress;
+                    setFieldValid('address', true);
                 }
             }).open();
         };
-        const handleValidationErrors = (errors) => {
-            for (const [field, message] of Object.entries(errors)) {
-                console.log(field);
-                const errorElement = document.getElementById(`${field}Error`);
-                if (errorElement) {
-                    errorElement.textContent = message;
-                }
-            }
-        };
 
-        usernameInput.addEventListener('blur', checkUsername);
-        confirmPasswordInput.addEventListener('blur', checkPasswordMatch);
-        document.getElementById('emailVerifyBtn').addEventListener('click', sendEmailVerification);
+        fields.username.input.addEventListener('blur', checkUsername);
+        fields.confirmPassword.input.addEventListener('blur', checkPasswordMatch);
+        // fields.email.input.addEventListener('click', sendEmailVerification);
+        fields.address.input.addEventListener('click', searchAddress);
+        fields.fullName.input.addEventListener('blur', () => {
+            const fullName = fields.fullName.input.value.trim();
+            if (fullName === '') {
+                setFieldValid('fullName', false, '이름을 입력하세요.');
+            } else {
+                setFieldValid('fullName', true);
+            }
+        });
+        fields.termsAccepted.input.addEventListener('change', () => {
+            setFieldValid('termsAccepted', fields.termsAccepted.input.checked);
+        });
+        fields.privacyPolicyAccepted.input.addEventListener('change', () => {
+            setFieldValid('privacyPolicyAccepted', fields.privacyPolicyAccepted.input.checked);
+        });
         document.getElementById('searchAddressBtn').addEventListener('click', searchAddress);
     });
 </script>
