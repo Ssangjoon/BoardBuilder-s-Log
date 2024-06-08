@@ -27,15 +27,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+//    @Column(nullable = false, unique = true)
+//    private String email;
 
     @Column(nullable = false)
     private String fullName;
 
     @Column(nullable = false)
     private String phone;
-    private LocalDate dateOfBirth;
+//    private LocalDate dateOfBirth;
     @Column(nullable = false)
     private boolean marketingConsent;
     @Column(nullable = false)

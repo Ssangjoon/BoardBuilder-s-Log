@@ -21,5 +21,7 @@ public class Address {
 
     @Column(nullable = false)
     private String zip;
+    @Column(nullable = false)
+    private String detailAddress;
 
 }

@@ -60,7 +60,7 @@
     <header>
         <h2>회원가입</h2>
     </header>
-    <form id="registrationForm">
+    <form id="registrationForm" action="/auth/registration" method="post">
         <section class="form-group">
             <label for="username">사용자 이름:</label>
             <input type="text" id="username" name="username" required>
@@ -98,18 +98,23 @@
         <section class="form-group">
             <label for="address">주소:</label>
             <button type="button" id="searchAddressBtn">주소검색</button>
-            <input type="text" id="address" name="address" disabled>
+            <input type="text" id="address" name="address" readonly >
             <div id="addressError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="roadAddress">도로명 주소:</label>
-            <input type="text" id="roadAddress" name="roadAddress" disabled>
+            <input type="text" id="roadAddress" name="roadAddress" readonly >
             <div id="roadAddressError" class="error"></div>
         </section>
         <section class="form-group">
             <label for="zip">우편번호:</label>
-            <input type="text" id="zip" name="zip" disabled>
+            <input type="text" id="zip" name="zip" readonly >
             <div id="zipError" class="error"></div>
+        </section>
+        <section class="form-group">
+            <label for="detailAddress">상세주소:</label>
+            <input type="text" id="detailAddress" name="detailAddress" required>
+            <div id="detailAddressError" class="error"></div>
         </section>
         <section class="form-group">
             <label>
@@ -152,20 +157,22 @@
             address: { input: document.getElementById('address'), valid: false },
             // roadAddress: { input: document.getElementById('roadAddress'), valid: false },
             // zip: { input: document.getElementById('zip'), valid: false },
+            detailAddrress:{input: document.getElementById('detailAddress'), valid: false},
             termsAccepted: { input: document.getElementById('termsAccepted'), valid: false },
             privacyPolicyAccepted: { input: document.getElementById('privacyPolicyAccepted'), valid: false }
         };
         const registerButton = document.querySelector('input[type="submit"]');
 
+        // fields에 전체 값이 바르게 입력되면 registerButton을 활성화 시킨다.
         const updateRegisterButtonState = () => {
             registerButton.disabled = !Object.values(fields).every(field => field.valid);
-            if (registerButton.disabled) {
-                const invalidFields = Object.keys(fields).map(field => {
-                    return { field, valid: fields[field].valid };
-                }).filter(field => !field.valid);
-
-                console.table(invalidFields);
-            }
+            // if (registerButton.disabled) {
+            //     const invalidFields = Object.keys(fields).map(field => {
+            //         return { field, valid: fields[field].valid };
+            //     }).filter(field => !field.valid);
+            //
+            //     console.table(invalidFields);
+            // }
         }
 
         // 모든 값 변경에 호출되고 updateRegisterButtonState을 실행한다.
@@ -173,12 +180,10 @@
         // valid가 false일 경우 errorMessage를 세팅한다.
         const setFieldValid = (field, isValid, message = '') =>{
             fields[field].valid = isValid;
-            if(!isValid){
-                const errorElement = document.getElementById(`${field}Error`);
-                if(errorElement){
-                    console.error("errorElement => ", message);
-                    errorElement.textContent = message;
-                }
+            const errorElement = document.getElementById(`${field}Error`);
+            if(errorElement){
+                console.error("errorElement => ", message);
+                errorElement.textContent = message;
             }
             updateRegisterButtonState();
         }
@@ -244,7 +249,7 @@
         const searchAddress = () => {
             new daum.Postcode({
                 oncomplete: (data) => {
-                    document.getElementById('address').value = data.address;
+                    document.getElementById('address').value = data.jibunAddress;
                     document.getElementById('zip').value = data.zonecode;
                     document.getElementById('roadAddress').value = data.roadAddress;
                     setFieldValid('address', true);
@@ -264,6 +269,15 @@
                 setFieldValid('fullName', true);
             }
         });
+        fields.detailAddrress.input.addEventListener('blur',() => {
+            const detailAddrress = fields.detailAddrress.input.value.trim();
+            if(detailAddrress === ''){
+                setFieldValid('detailAddrress', false, '상세주소를 입력하세요');
+            } else {
+                setFieldValid('detailAddrress', true);
+            }
+
+        })
         fields.termsAccepted.input.addEventListener('change', () => {
             setFieldValid('termsAccepted', fields.termsAccepted.input.checked);
         });

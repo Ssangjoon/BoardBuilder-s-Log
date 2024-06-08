@@ -1,5 +1,6 @@
 package com.boardbuilderslog.bulletin_board.service.impl;
 
+import com.boardbuilderslog.bulletin_board.dto.UserRegistrationRequest;
 import com.boardbuilderslog.bulletin_board.repsoitory.UserRepository;
 import com.boardbuilderslog.bulletin_board.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,10 @@ public class UserServiceImpl implements UserService {
         if (repository.existsByUsername(username)) {
             throw new IllegalArgumentException("사용자 이름이 이미 사용 중입니다.");
         }
+    }
+
+    @Override
+    public void registrate(UserRegistrationRequest request) {
+        repository.save(request.toEntity());
     }
 }
