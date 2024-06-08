@@ -33,8 +33,8 @@ public class User {
     @Column(nullable = false)
     private String fullName;
 
-    @Column(nullable = false)
-    private String phone;
+//    @Column(nullable = false)
+//    private String phone;
 //    private LocalDate dateOfBirth;
     @Column(nullable = false)
     private boolean marketingConsent;
