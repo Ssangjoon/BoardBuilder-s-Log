@@ -20,13 +20,6 @@ import java.time.LocalDate;
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
-    @PostConstruct
-    public void init(){
-        Address addressEntity = Address.builder().address("123 Main St").roadAddress("456 Elm St").zip("12345").detailAddress("Apt 789").build();
-        User userEntity = User.builder().username("ssang").password("123").fullName("sangjoon").marketingConsent(true).termsAccepted(true).privacyPolicyAccepted(true).address(addressEntity).build();
-        repository.save(userEntity);
-    }
-
     @Override
     public void checkUsername(String username) {
         if (repository.existsByUsername(username)) {

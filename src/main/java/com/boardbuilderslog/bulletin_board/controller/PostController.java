@@ -27,7 +27,7 @@ public class PostController {
 
     private final PostService postService;
     @GetMapping
-    public String posts(Model model, @PageableDefault(size = 2, sort = "title") Pageable pageable){
+    public String posts(Model model, @PageableDefault(size = 5, sort = "title") Pageable pageable){
         log.info(String.valueOf(pageable.getOffset()));
         Page<PostSelectOneResponse> postResponses = postService.selectList(pageable);
         model.addAttribute("posts", postResponses);

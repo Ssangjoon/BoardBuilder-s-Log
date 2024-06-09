@@ -30,14 +30,6 @@ public class PostServiceImpl implements PostService {
     private final PostRepository repository;
     private final FileStorageService fileStorageService;
 
-    @PostConstruct
-    public void init(){
-        repository.save(Post.builder().title("제목1").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
-        repository.save(Post.builder().title("제목2").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
-        repository.save(Post.builder().title("제목3").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
-        repository.save(Post.builder().title("제목4").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
-        repository.save(Post.builder().title("제목5").content("내용").endDate(LocalDate.now()).startDate(LocalDate.now()).isPublic(true).build());
-    }
     @Transactional
     @Override
     public long insertPost(PostCreateReqeust dto) throws IOException {
