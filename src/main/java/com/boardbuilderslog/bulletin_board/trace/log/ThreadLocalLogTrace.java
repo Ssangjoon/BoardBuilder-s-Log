@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ThreadLocalLogTrace implements LogTrace {
-    private static final String START_PREFIX = "-->";
-    private static final String COMPLETE_PREFIX = "<--";
-    private static final String EX_PREFIX = "<X-";
+    private static final String START_PREFIX = "===> ";
+    private static final String COMPLETE_PREFIX = "<=== ";
+    private static final String EX_PREFIX = "<X== ";
 
     private ThreadLocal<TraceId> traceIdHolder = new ThreadLocal<>();
     @Override

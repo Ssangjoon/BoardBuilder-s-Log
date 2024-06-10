@@ -58,7 +58,7 @@
             const totalPages = [[${posts.totalPages}]];
             const paginationContainer = document.getElementById('pagination');
 
-            function createPageLink(page, text, isCurrent = false) {
+            const createPageLink = (page, text, isCurrent = false) => {
                 const link = document.createElement('a');
                 link.href = `?page=${page}`;
                 link.textContent = text;
@@ -68,7 +68,7 @@
                 return link;
             }
 
-            function renderPagination(currentPage, totalPages) {
+            const renderPagination =(currentPage, totalPages) => {
                 paginationContainer.innerHTML = '';
 
                 let startPage = Math.max(0, currentPage - 2);
@@ -100,10 +100,10 @@
 
             renderPagination(currentPage, totalPages);
         });
-        function redirectToPost(postId) {
+        const redirectToPost = (postId) => {
             window.location.href = '/posts/' + postId;
         }
-        function redirectToAddPost() {
+        const redirectToAddPost = () => {
             window.location.href = '/posts/addPost';
         }
     </script>
