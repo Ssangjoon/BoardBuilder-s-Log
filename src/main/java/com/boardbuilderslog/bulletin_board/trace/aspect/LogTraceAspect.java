@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Aspect
-@Component
+//@Component
 public class LogTraceAspect {
     private final LogTrace logTrace;
 

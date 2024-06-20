@@ -30,11 +30,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/", "/auth/registration", "/login","/auth/**", "/css/**","/*.ico","/error");
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(new LoginCheckInterceptor())
+//                .addPathPatterns("/**")
+//                .excludePathPatterns("/", "/auth/registration", "/login","/auth/**", "/css/**","/*.ico","/error");
+//    }
 
 }

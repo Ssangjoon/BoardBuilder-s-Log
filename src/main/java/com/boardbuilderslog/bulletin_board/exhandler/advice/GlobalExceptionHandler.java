@@ -1,10 +1,9 @@
 package com.boardbuilderslog.bulletin_board.exhandler.advice;
 
-import com.boardbuilderslog.bulletin_board.exhandler.ErrorResult;
+import com.boardbuilderslog.bulletin_board.exhandler.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -24,16 +23,16 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ErrorResponse response = new ErrorResponse("400", "잘못된 요청입니다.");
         BindingResult bindingResult = ex.getBindingResult();
         for (FieldError error : bindingResult.getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
+            response.addValidation(error.getField(), error.getDefaultMessage());
         }
         for (ObjectError error : bindingResult.getGlobalErrors()) {
-            errors.put("global", error.getDefaultMessage());
+            response.addValidation("global", error.getDefaultMessage());
         }
-        return errors;
+        return response;
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
@@ -58,8 +57,8 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
-    public ErrorResult exHandle(Exception e) {
+    public ErrorResponse exHandle(Exception e) {
         log.error("[exceptionHandle] ex", e);
-        return new ErrorResult("EX", "내부 오류");
+        return new ErrorResponse("EX", "내부 오류");
     }
 }
